@@ -100,32 +100,59 @@ export default function EmployeeDashboard() {
                 ) : !profileData ? (
                   <p className="text-gray-500">No profile data available.</p>
                 ) : (
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <InfoItem label="Name" value={`${profileData.firstName || "N/A"} ${profileData.lastName || ""}`} />
-                    <InfoItem label="Employee ID" value={profileData.employeeId} />
-                    <InfoItem label="Department" value={profileData.department} />
-                    <InfoItem
-                      label="Date of Birth"
-                      value={
-                        profileData.dob ? format(new Date(profileData.dob), "MMM dd, yyyy") : "N/A"
-                      }
-                    />
-                    <InfoItem label="Gender" value={profileData.gender} />
-                    <InfoItem label="Contact Number" value={profileData.phone} />
-                    <InfoItem label="Email Address" value={profileData.email} />
-                    <InfoItem label="Address" value={profileData.address} />
-                    <InfoItem
-                      label="Basic Salary"
-                      value={profileData.salary ? `₹${profileData.salary}` : "N/A"}
-                    />
-                    <InfoItem label="Bank Account Number" value={profileData.bankAccount} />
-                    <InfoItem label="Tax ID / PAN / SSN" value={profileData.taxId} />
-                    <InfoItem label="Employment Type" value={profileData.employmentType} />
-                    <InfoItem label="Bank Name" value={profileData.bankName} />
-                    <InfoItem label="Bank Branch" value={profileData.bankBranch} />
-                    <div>
-                      <label className="text-sm font-medium text-gray-700">Status</label>
-                      <Badge className="bg-green-100 text-green-800">Active</Badge>
+                  <div className="space-y-6">
+                    {/* Profile Image */}
+                    <div className="flex items-center gap-4 pb-4 border-b">
+                      <div className="relative w-20 h-20 flex-shrink-0">
+                        {profileData.profileImage ? (
+                          <img
+                            src={profileData.profileImage}
+                            alt="Profile"
+                            className="w-full h-full rounded-full object-cover border-4 border-gray-200"
+                            data-testid="img-profile"
+                          />
+                        ) : (
+                          <div className="w-full h-full rounded-full bg-gray-200 flex items-center justify-center border-4 border-gray-300">
+                            <User className="w-10 h-10 text-gray-400" />
+                          </div>
+                        )}
+                      </div>
+                      <div>
+                        <h3 className="text-lg font-semibold text-gray-900" data-testid="text-employee-name">
+                          {`${profileData.firstName || "N/A"} ${profileData.lastName || ""}`}
+                        </h3>
+                        <p className="text-sm text-gray-500" data-testid="text-employee-id">
+                          {profileData.employeeId}
+                        </p>
+                      </div>
+                    </div>
+
+                    {/* Profile Details Grid */}
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <InfoItem label="Department" value={profileData.department} />
+                      <InfoItem
+                        label="Date of Birth"
+                        value={
+                          profileData.dob ? format(new Date(profileData.dob), "MMM dd, yyyy") : "N/A"
+                        }
+                      />
+                      <InfoItem label="Gender" value={profileData.gender} />
+                      <InfoItem label="Contact Number" value={profileData.phone} />
+                      <InfoItem label="Email Address" value={profileData.email} />
+                      <InfoItem label="Address" value={profileData.address} />
+                      <InfoItem
+                        label="Basic Salary"
+                        value={profileData.salary ? `₹${profileData.salary}` : "N/A"}
+                      />
+                      <InfoItem label="Bank Account Number" value={profileData.bankAccount} />
+                      <InfoItem label="Tax ID / PAN / SSN" value={profileData.taxId} />
+                      <InfoItem label="Employment Type" value={profileData.employmentType} />
+                      <InfoItem label="Bank Name" value={profileData.bankName} />
+                      <InfoItem label="Bank Branch" value={profileData.bankBranch} />
+                      <div>
+                        <label className="text-sm font-medium text-gray-700">Status</label>
+                        <Badge className="bg-green-100 text-green-800">Active</Badge>
+                      </div>
                     </div>
                   </div>
                 )}
