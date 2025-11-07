@@ -63,7 +63,7 @@ export default function EditEmployee({ params }) {
         firstName: employee.firstName || "",
         lastName: employee.lastName || "",
         email: employee.email || "",
-        phone: employee.phone || "",
+        phone: employee.phone?.toString() || "",
         department: employee.department || "",
         position: employee.position || "",
         salary: employee.salary ? Number(employee.salary) : 0,

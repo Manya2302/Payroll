@@ -136,15 +136,18 @@ export default function Profile() {
   const saveProfileMutation = useMutation({
     mutationFn: async (data) => {
       // If profile exists, update; else, create
+      let response;
       if (profile && profile.employeeId) {
-        return await updateProfile(data);
+        response = await updateProfile(data);
       } else {
-        return await createProfile(data);
+        response = await createProfile(data);
       }
+      const profileData = await response.json();
+      return profileData;
     },
-    onSuccess: async () => {
+    onSuccess: async (data) => {
+      queryClient.setQueryData(["/api/profile"], data);
       await queryClient.invalidateQueries({ queryKey: ["/api/profile"] });
-      await queryClient.refetchQueries({ queryKey: ["/api/profile"] });
       toast({
         title: "Success",
         description: "Profile saved successfully. You can now upload your profile image.",
@@ -240,11 +243,13 @@ export default function Profile() {
     },
   });
 
-  const handleProfileImageUpload = (event) => {
+  const handleProfileImageUpload = async (event) => {
     const file = event.target.files?.[0];
     if (!file) return;
 
-    if (!profile?.employeeId) {
+    const currentProfile = queryClient.getQueryData(["/api/profile"]);
+    
+    if (!currentProfile?.employeeId) {
       toast({
         title: "Error",
         description: "Please save your profile before uploading an image",
@@ -255,7 +260,7 @@ export default function Profile() {
 
     const formData = new FormData();
     formData.append("profileImage", file);
-    formData.append("employeeId", profile.employeeId);
+    formData.append("employeeId", currentProfile.employeeId);
 
     uploadProfileImageMutation.mutate(formData);
   };
