@@ -2399,7 +2399,7 @@ export function createRoutes(app) {
 
   /*** FILE UPLOAD ROUTES ***/
   import('./routes/uploads.js').then(uploadRoutes => {
-    uploadRoutes.setupUploadRoutes(app, requireAuth);
+    uploadRoutes.setupUploadRoutes(app, requireAuth, requireAdmin);
   });
 
   app.use('/uploads', express.static('uploads'));

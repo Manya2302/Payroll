@@ -15,7 +15,7 @@ import { Form, FormField, FormItem, FormLabel, FormControl, FormMessage } from "
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
 const profileSchema = z.object({
-  employeeId: z.string().min(1, "Employee ID is required"),
+  employeeId: z.string().optional(),
   firstName: z.string().min(1, "First name is required"),
   lastName: z.string().min(1, "Last name is required"),
   dob: z.string().min(1, "Date of birth is required"),
@@ -438,19 +438,30 @@ export default function Profile() {
                       )}
                     />
 
-                    <FormField
-                      control={profileForm.control}
-                      name="employeeId"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>Employee ID</FormLabel>
-                          <FormControl>
-                            <Input placeholder="Auto-generated or manual" {...field} />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
+                    {profile?.employeeId && (
+                      <FormField
+                        control={profileForm.control}
+                        name="employeeId"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Employee ID</FormLabel>
+                            <FormControl>
+                              <Input 
+                                placeholder="Auto-generated" 
+                                {...field} 
+                                disabled 
+                                className="bg-gray-100 cursor-not-allowed"
+                                data-testid="input-employee-id" 
+                              />
+                            </FormControl>
+                            <p className="text-xs text-muted-foreground mt-1">
+                              Auto-generated employee ID (read-only)
+                            </p>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                    )}
 
                     <FormField
                       control={profileForm.control}

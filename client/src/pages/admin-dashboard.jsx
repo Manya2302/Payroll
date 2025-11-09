@@ -63,6 +63,13 @@ export default function AdminDashboard() {
       color: "bg-purple-500",
     },
     {
+      title: "Verify Documents",
+      description: "Review and verify employee documents",
+      icon: FileText,
+      href: "/admin/documents",
+      color: "bg-blue-500",
+    },
+    {
       title: "View Reports",
       description: "Generate comprehensive reports",
       icon: FileText,

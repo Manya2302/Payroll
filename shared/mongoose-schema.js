@@ -1,6 +1,27 @@
 import mongoose from 'mongoose';
 import { z } from 'zod';
 
+// Counter Schema for auto-incrementing IDs
+const counterSchema = new mongoose.Schema({
+  _id: { type: String, required: true },
+  sequence_value: { type: Number, default: 0 }
+});
+
+export const Counter = mongoose.model('Counter', counterSchema);
+
+// Helper function to get next sequence value
+export async function getNextSequence(sequenceName, session = null) {
+  const options = session ? { session, returnDocument: 'after', upsert: true } : { returnDocument: 'after', upsert: true };
+  
+  const counter = await Counter.findOneAndUpdate(
+    { _id: sequenceName },
+    { $inc: { sequence_value: 1 } },
+    options
+  );
+  
+  return counter.sequence_value;
+}
+
 // User Schema
 const userSchema = new mongoose.Schema({
   username: {
@@ -47,6 +68,11 @@ userSchema.set('toObject', {
 
 // Employee Schema
 const employeeSchema = new mongoose.Schema({
+  employeeId: {
+    type: String,
+    unique: true,
+    sparse: true
+  },
   userId: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'User',
@@ -811,6 +837,21 @@ const documentSchema = new mongoose.Schema({
     type: Number
   },
   mimeType: {
+    type: String
+  },
+  verificationStatus: {
+    type: String,
+    enum: ['pending', 'approved', 'rejected'],
+    default: 'pending'
+  },
+  verifiedBy: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'User'
+  },
+  verificationDate: {
+    type: Date
+  },
+  verificationNotes: {
     type: String
   },
   uploadedAt: {

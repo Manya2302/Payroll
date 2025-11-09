@@ -1,4 +1,4 @@
-import { Profile, Document } from '../../shared/mongoose-schema.js';
+import { Profile, Document, Employee, User } from '../../shared/mongoose-schema.js';
 import { uploadProfileImage, uploadDocument } from '../config/multer.js';
 import path from 'path';
 import fs from 'fs';
@@ -7,7 +7,7 @@ import mongoose from 'mongoose';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
-export function setupUploadRoutes(app, requireAuth) {
+export function setupUploadRoutes(app, requireAuth, requireAdmin) {
   
   app.post('/api/profile/upload-image', requireAuth, uploadProfileImage.single('profileImage'), async (req, res) => {
     try {
@@ -155,6 +155,91 @@ export function setupUploadRoutes(app, requireAuth) {
     } catch (error) {
       console.error('Error deleting document:', error);
       res.status(500).json({ message: 'Error deleting document', error: error.message });
+    }
+  });
+
+  app.get('/api/admin/documents', requireAdmin, async (req, res) => {
+    try {
+      const skipDb = (process.env.SKIP_DB || 'false').toLowerCase() === 'true';
+      
+      if (skipDb) {
+        return res.json({ documents: [] });
+      }
+
+      const documents = await Document.find()
+        .populate('userId', 'username email')
+        .populate('employeeId', 'firstName lastName employeeId department')
+        .sort({ uploadedAt: -1 });
+
+      const documentsWithEmployeeInfo = await Promise.all(documents.map(async (doc) => {
+        const docObj = doc.toObject();
+        
+        if (!docObj.employeeId) {
+          const employee = await Employee.findOne({ userId: docObj.userId._id });
+          if (employee) {
+            docObj.employeeInfo = {
+              firstName: employee.firstName,
+              lastName: employee.lastName,
+              employeeId: employee.employeeId,
+              department: employee.department
+            };
+          }
+        } else {
+          docObj.employeeInfo = {
+            firstName: docObj.employeeId.firstName,
+            lastName: docObj.employeeId.lastName,
+            employeeId: docObj.employeeId.employeeId,
+            department: docObj.employeeId.department
+          };
+        }
+        
+        return docObj;
+      }));
+
+      res.json({ documents: documentsWithEmployeeInfo });
+    } catch (error) {
+      console.error('Error fetching admin documents:', error);
+      res.status(500).json({ message: 'Error fetching documents', error: error.message });
+    }
+  });
+
+  app.put('/api/admin/documents/:id/verify', requireAdmin, async (req, res) => {
+    try {
+      const skipDb = (process.env.SKIP_DB || 'false').toLowerCase() === 'true';
+      
+      if (skipDb) {
+        return res.json({ message: 'Document verified successfully (SKIP_DB mode)' });
+      }
+
+      const documentId = req.params.id;
+      const { verificationStatus, verificationNotes } = req.body;
+
+      if (!['approved', 'rejected', 'pending'].includes(verificationStatus)) {
+        return res.status(400).json({ message: 'Invalid verification status' });
+      }
+
+      const document = await Document.findByIdAndUpdate(
+        documentId,
+        {
+          verificationStatus,
+          verifiedBy: req.user.id,
+          verificationDate: new Date(),
+          verificationNotes: verificationNotes || ''
+        },
+        { new: true }
+      );
+
+      if (!document) {
+        return res.status(404).json({ message: 'Document not found' });
+      }
+
+      res.json({ 
+        message: 'Document verification status updated successfully',
+        document: document.toObject()
+      });
+    } catch (error) {
+      console.error('Error verifying document:', error);
+      res.status(500).json({ message: 'Error verifying document', error: error.message });
     }
   });
 }

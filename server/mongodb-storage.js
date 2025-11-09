@@ -413,7 +413,7 @@
 //   }
 // }
 import { 
-  User, Employee, Payroll, LeaveRequest, Attendance, Profile, Loan, EMI
+  User, Employee, Payroll, LeaveRequest, Attendance, Profile, Loan, EMI, getNextSequence
 } from "../shared/mongoose-schema.js";
 import mongoose from "mongoose";
 import session from "express-session";
@@ -550,7 +550,13 @@ export class DatabaseStorage {
 
   async createEmployee(insertEmployee) {
     try {
-      const employee = new Employee(insertEmployee);
+      const nextSeq = await getNextSequence('employeeId');
+      const employeeId = 'E' + String(nextSeq).padStart(2, '0');
+      
+      const employee = new Employee({
+        ...insertEmployee,
+        employeeId
+      });
       await employee.save();
       return employee.toObject();
     } catch (error) {

@@ -41,6 +41,7 @@ import ProjectNotifications from "@/components/ProjectNotifications.jsx";
 import AdminProjects from "@/pages/projects/admin-projects.jsx";
 import ProjectDetail from "@/pages/projects/project-detail.jsx";
 import EmployeeTasks from "@/pages/projects/employee-tasks.jsx";
+import AdminDocumentVerification from "@/pages/admin-document-verification.jsx";
 
 function Router() {
   return (
@@ -82,6 +83,7 @@ function Router() {
       <ProtectedRoute path="/meetings/room/:roomName" component={MeetingRoom} />
       <ProtectedRoute path="/admin/projects" component={AdminProjects} />
       <ProtectedRoute path="/admin/projects/:id" component={ProjectDetail} />
+      <ProtectedRoute path="/admin/documents" component={AdminDocumentVerification} />
       <ProtectedRoute path="/tasks" component={EmployeeTasks} />
       <Route path="/help-us" component={HelpUs} />
       <Route component={NotFound} />
