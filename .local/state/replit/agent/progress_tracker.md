@@ -6,3 +6,5 @@
 [x] 6. Migration completed successfully
 [x] 7. Fixed profile image upload issue
 [x] 8. Fixed phone number validation error in admin employee edit
+[x] 9. Installed cross-env package to fix workflow startup issue
+[x] 10. Application successfully running and verified with screenshot
