@@ -8,3 +8,9 @@
 [x] 8. Fixed phone number validation error in admin employee edit
 [x] 9. Installed cross-env package to fix workflow startup issue
 [x] 10. Application successfully running and verified with screenshot
+[x] 11. Added empid field to Profile schema for auto-generation (E01, E02, etc.)
+[x] 12. Updated profile creation route to auto-generate empid
+[x] 13. Removed employeeId input field from profile form
+[x] 14. Made employeeId optional in Profile schema (auto-populated by backend)
+[x] 15. Added "Document Verification" link to admin sidebar navigation
+[x] 16. All changes tested and application running successfully

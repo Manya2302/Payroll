@@ -5,7 +5,7 @@ import express from 'express';
 import {
   insertEmployeeSchema, insertPayrollSchema, insertLeaveRequestSchema,
   insertAttendanceSchema, Profile, insertProfileSchema, Query, insertLoanSchema,
-  Calendar
+  Calendar, getNextSequence
 } from "../shared/mongoose-schema.js";
 import nodemailer from "nodemailer";
 import { createPaypalOrder, capturePaypalOrder, loadPaypalDefault } from "./paypal.js";
@@ -723,7 +723,13 @@ export function createRoutes(app) {
         return res.status(400).json({ message: "Profile already exists for this employeeId" });
       }
 
-      const profile = new Profile(validatedData);
+      const nextSeq = await getNextSequence('profileEmpId');
+      const empid = 'E' + String(nextSeq).padStart(2, '0');
+
+      const profile = new Profile({
+        ...validatedData,
+        empid
+      });
       await profile.save();
       res.status(201).json(profile);
     } catch (error) {

@@ -900,7 +900,13 @@ export class DatabaseStorage {
 
   async createProfile(profileData) {
     try {
-      const profile = new Profile(profileData);
+      const nextSeq = await getNextSequence('profileEmpId');
+      const empid = 'E' + String(nextSeq).padStart(2, '0');
+      
+      const profile = new Profile({
+        ...profileData,
+        empid
+      });
       await profile.save();
       return profile.toObject();
     } catch (error) {

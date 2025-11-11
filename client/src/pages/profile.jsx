@@ -438,31 +438,6 @@ export default function Profile() {
                       )}
                     />
 
-                    {profile?.employeeId && (
-                      <FormField
-                        control={profileForm.control}
-                        name="employeeId"
-                        render={({ field }) => (
-                          <FormItem>
-                            <FormLabel>Employee ID</FormLabel>
-                            <FormControl>
-                              <Input 
-                                placeholder="Auto-generated" 
-                                {...field} 
-                                disabled 
-                                className="bg-gray-100 cursor-not-allowed"
-                                data-testid="input-employee-id" 
-                              />
-                            </FormControl>
-                            <p className="text-xs text-muted-foreground mt-1">
-                              Auto-generated employee ID (read-only)
-                            </p>
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />
-                    )}
-
                     <FormField
                       control={profileForm.control}
                       name="dob"

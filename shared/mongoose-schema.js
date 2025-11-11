@@ -220,8 +220,14 @@ const attendanceSchema = new mongoose.Schema({
 const profileSchema = new mongoose.Schema({
   employeeId: {
     type: String,
-    required: true,
-    unique: true
+    required: false,
+    unique: true,
+    sparse: true
+  },
+  empid: {
+    type: String,
+    unique: true,
+    sparse: true
   },
   firstName: {
     type: String,
@@ -349,7 +355,8 @@ export const insertAttendanceSchema = z.object({
 });
 
 export const insertProfileSchema = z.object({
-  employeeId: z.string().min(1, "Employee ID is required"),
+  employeeId: z.string().optional(),
+  empid: z.string().optional(),
   firstName: z.string().min(1, "First name is required"),
   lastName: z.string().min(1, "Last name is required"),
   dob: z.preprocess((val) => val ? new Date(val) : undefined, z.date({ required_error: "Date of birth is required" })),

@@ -16,7 +16,8 @@ import {
   X ,
   Mail,
   Moon,
-  Sun
+  Sun,
+  FileCheck
 } from "lucide-react";
 import { Link } from "wouter";
 
@@ -27,6 +28,7 @@ const navigation = {
     { name: 'Payroll', href: '/payroll', icon: DollarSign },
     { name: 'Leave Requests', href: '/leaves', icon: Calendar },
     { name: 'Attendance', href: '/attendance', icon: Clock },
+    { name: 'Document Verification', href: '/admin/documents', icon: FileCheck },
     { name: 'Reports', href: '/reports', icon: FileText },
     { name: 'Profile', href: '/profile', icon: User },
     { name: 'Queries', href: '/admin/queries', icon: Mail },  ],
