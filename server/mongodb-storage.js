@@ -497,7 +497,13 @@ export class DatabaseStorage {
   async getEmployeeByUserId(userId) {
     try {
       const employee = await Employee.findOne({ userId });
-      return employee ? employee.toObject() : undefined;
+      if (employee) {
+        const empObj = employee.toObject();
+        console.log('[getEmployeeByUserId] Found employee:', { userId, empId: empObj._id, hasId: !!empObj.id });
+        return empObj;
+      }
+      console.log('[getEmployeeByUserId] No employee found for userId:', userId);
+      return undefined;
     } catch (error) {
       console.error('Error getting employee by user ID:', error);
       return undefined;
@@ -699,7 +705,15 @@ export class DatabaseStorage {
 
   async createLeaveRequest(insertRequest) {
     try {
-      const request = new LeaveRequest(insertRequest);
+      const requestData = {
+        ...insertRequest
+      };
+      
+      if (typeof insertRequest.employeeId === 'string') {
+        requestData.employeeId = new mongoose.Types.ObjectId(insertRequest.employeeId);
+      }
+      
+      const request = new LeaveRequest(requestData);
       await request.save();
       return request.toObject();
     } catch (error) {

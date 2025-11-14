@@ -52,13 +52,17 @@ export default function AdminDocumentVerification() {
         verificationNotes,
       });
     },
-    onSuccess: () => {
+    onSuccess: (response, variables) => {
       queryClient.invalidateQueries({ queryKey: ["/api/admin/documents"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/documents"] });
       setSelectedDocument(null);
       setVerificationNotes("");
+      const message = variables.verificationStatus === 'rejected' 
+        ? "Document rejected and deleted successfully"
+        : "Document verification status updated successfully";
       toast({
         title: "Success",
-        description: "Document verification status updated successfully",
+        description: message,
       });
     },
     onError: (error) => {

@@ -347,14 +347,22 @@ export function createRoutes(app) {
       const user = req.user;
       if (user.role === 'admin') {
         const requests = await storage.getAllLeaveRequests();
+        console.log(`[leave-requests] Admin fetched ${requests.length} requests`);
         res.json(requests);
       } else {
         const employee = await storage.getEmployeeByUserId(user.id);
-        const requests = await storage.getLeaveRequestsByEmployee(employee.id);
+        if (!employee) {
+          console.error('[leave-requests] Employee not found for user:', user.id);
+          return res.status(404).json({ message: "Employee profile not found" });
+        }
+        const employeeId = employee._id.toString();
+        const requests = await storage.getLeaveRequestsByEmployee(employeeId);
+        console.log(`[leave-requests] Employee ${employeeId} fetched ${requests.length} requests`);
         res.json(requests);
       }
     } catch (error) {
-      res.status(500).json({ message: "Failed to fetch leave requests" });
+      console.error('[leave-requests] Error fetching leave requests:', error);
+      res.status(500).json({ message: "Failed to fetch leave requests", error: error.message });
     }
   });
 
@@ -363,9 +371,12 @@ export function createRoutes(app) {
       const employee = await storage.getEmployeeByUserId(req.user.id);
       if (!employee) return res.status(404).json({ message: "Employee profile not found" });
 
+      const employeeId = employee._id.toString();
+      console.log('[leave-request] Creating request for employee:', employeeId);
+
       const requestData = {
         ...req.body,
-        employeeId: (employee.id || employee._id).toString(),
+        employeeId,
         startDate: new Date(req.body.startDate),
         endDate: new Date(req.body.endDate)
       };
@@ -374,6 +385,7 @@ export function createRoutes(app) {
       const request = await storage.createLeaveRequest(validatedData);
       res.status(201).json(request);
     } catch (error) {
+      console.error('Error creating leave request:', error);
       res.status(400).json({ message: "Invalid leave request data", error: error.message });
     }
   });

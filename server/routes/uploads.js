@@ -175,14 +175,16 @@ export function setupUploadRoutes(app, requireAuth, requireAdmin) {
         const docObj = doc.toObject();
         
         if (!docObj.employeeId) {
-          const employee = await Employee.findOne({ userId: docObj.userId._id });
-          if (employee) {
-            docObj.employeeInfo = {
-              firstName: employee.firstName,
-              lastName: employee.lastName,
-              employeeId: employee.employeeId,
-              department: employee.department
-            };
+          if (docObj.userId && docObj.userId._id) {
+            const employee = await Employee.findOne({ userId: docObj.userId._id });
+            if (employee) {
+              docObj.employeeInfo = {
+                firstName: employee.firstName,
+                lastName: employee.lastName,
+                employeeId: employee.employeeId,
+                department: employee.department
+              };
+            }
           }
         } else {
           docObj.employeeInfo = {
@@ -218,25 +220,46 @@ export function setupUploadRoutes(app, requireAuth, requireAdmin) {
         return res.status(400).json({ message: 'Invalid verification status' });
       }
 
-      const document = await Document.findByIdAndUpdate(
-        documentId,
-        {
-          verificationStatus,
-          verifiedBy: req.user.id,
-          verificationDate: new Date(),
-          verificationNotes: verificationNotes || ''
-        },
-        { new: true }
-      );
+      if (verificationStatus === 'rejected') {
+        const document = await Document.findById(documentId);
+        
+        if (!document) {
+          return res.status(404).json({ message: 'Document not found' });
+        }
 
-      if (!document) {
-        return res.status(404).json({ message: 'Document not found' });
+        const filePathRelative = document.documentUrl.startsWith('/') ? document.documentUrl.slice(1) : document.documentUrl;
+        const filePath = path.join(__dirname, '..', '..', filePathRelative);
+        if (fs.existsSync(filePath)) {
+          fs.unlinkSync(filePath);
+        }
+
+        await Document.deleteOne({ _id: documentId });
+
+        res.json({ 
+          message: 'Document rejected and deleted successfully',
+          deleted: true
+        });
+      } else {
+        const document = await Document.findByIdAndUpdate(
+          documentId,
+          {
+            verificationStatus,
+            verifiedBy: req.user.id,
+            verificationDate: new Date(),
+            verificationNotes: verificationNotes || ''
+          },
+          { new: true }
+        );
+
+        if (!document) {
+          return res.status(404).json({ message: 'Document not found' });
+        }
+
+        res.json({ 
+          message: 'Document verification status updated successfully',
+          document: document.toObject()
+        });
       }
-
-      res.json({ 
-        message: 'Document verification status updated successfully',
-        document: document.toObject()
-      });
     } catch (error) {
       console.error('Error verifying document:', error);
       res.status(500).json({ message: 'Error verifying document', error: error.message });
