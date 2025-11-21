@@ -7,6 +7,7 @@
     "dev": "cross-env NODE_ENV=development node server/index.js",
     "build": "cross-env NODE_ENV=production vite build && esbuild server/index.js --platform=node --packages=external --bundle --format=esm --outdir=dist",
     "start": "cross-env NODE_ENV=production node dist/index.js",
+    "vercel:build": "cross-env NODE_ENV=production vite build",
     "db:push": "cross-env NODE_ENV=production drizzle-kit push"
   },
   "dependencies": {
